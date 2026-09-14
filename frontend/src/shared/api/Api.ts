@@ -1,8 +1,10 @@
 export class BaseApi {
 
-    basePath = import.meta.env.BACKEND_URL ?? "http://localhost:3000/";
+    basePath = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:3000/";
 
-    constructor() {}
+    constructor() {
+        console.log(import.meta.env.VITE_BACKEND_URL)
+    }
 
     protected doFetch(
         url: string,
