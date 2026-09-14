@@ -13,17 +13,16 @@ const Panel = (props: PanelProps) => {
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     
     const loaderRef = useRef<HTMLDivElement>(null); 
-    
     const isLoadingRef = useRef<boolean>(false);
-
     const loadingOffset = useRef<number>(0);
-
     const loadingFunction = useRef<(offset: number, limit: number, search: string) => Promise<Item[]>>(null);
+    const isDraggingRef = useRef<boolean>(false);
 
     const api = new ItemsApi();
 
     const handleDragStart = (index: number) => {
         setDraggedIndex(index);
+        isDraggingRef.current = true;
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>, targetIndex: number) => {
@@ -39,12 +38,11 @@ const Panel = (props: PanelProps) => {
     };
 
     const handleDragEnd = () => {
-        console.log(123)
         if (draggedIndex === null) return;
 
         const currentEntries = Array.from(items.entries());
         
-        const [itemId, ] = currentEntries[draggedIndex];
+        const [itemId,] = currentEntries[draggedIndex];
 
         const beforeEntry = currentEntries[draggedIndex - 1];
         const afterEntry = currentEntries[draggedIndex + 1];
@@ -54,8 +52,7 @@ const Panel = (props: PanelProps) => {
 
         setDraggedIndex(null);
 
-        api.moveItem(itemId, targetBeforeId, targetAfterId)
-            .then(updateItems);
+        api.moveItem(itemId, targetBeforeId, targetAfterId).then(() => setTimeout(() => isDraggingRef.current = false, 1200));
     };
 
     const debouncedSearch = useMemo(() => {
@@ -76,12 +73,7 @@ const Panel = (props: PanelProps) => {
     };
 
     function handleSelect(itemId: string) {
-        api.switchSelected(itemId).then(() => {
-            if (items.get(itemId)!.selected === props.isSelectedItems)  {
-                items.delete(itemId);
-                props.onUpdateList();
-            }
-        });
+        api.switchSelected(itemId).then(props.onUpdateList);
     };
 
     function handleSearch(e: ChangeEvent) {
@@ -121,7 +113,7 @@ const Panel = (props: PanelProps) => {
                             loadingOffset.current = nextOffset;
 
                             setItems((prev) => {
-                                const next = prev;
+                                const next = new Map(prev);
                                 response.forEach(item => next.set(item.id, item))
                                 return next;
                             });
@@ -143,7 +135,15 @@ const Panel = (props: PanelProps) => {
         };
     }, [search]);
 
-    useEffect(updateItems, [props.updateTrigger])
+    useEffect(updateItems, [props.updateTrigger]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (isDraggingRef.current) return; 
+            updateItems();
+        }, 1500);
+        return () => clearInterval(interval);
+    }, [])
 
     return <>
         <section key={props.panelClass} className={props.panelClass}>
@@ -186,7 +186,11 @@ const Panel = (props: PanelProps) => {
                     </p>
                     <button
                         key={'button-item-' + item.id}
-                        onClick={() => handleSelect(item.id)}
+                        onClick={(e) => {
+                            (e.target as HTMLButtonElement).parentElement!.classList.add('disabled');
+                            (e.target as HTMLButtonElement).disabled = true;
+                            handleSelect(item.id)
+                        }}
                     >
                         {!props.isSelectedItems ? 'Выбрать' : 'Убрать выбор'}
                     </button>

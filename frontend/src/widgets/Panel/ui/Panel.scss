@@ -74,6 +74,10 @@ section {
             background-color: #432b0e;
             color: #ffe4c4;
             cursor: pointer;
+
+            &:disabled {
+                color: #a18c72;
+            }
         }
 
         & > p {
@@ -94,6 +98,10 @@ section {
                 font-size: 0.7em;
                 color: #9f8360;
             }
+        }
+
+        &.disabled {
+            background-color: #a18c72;
         }
     }
 }
