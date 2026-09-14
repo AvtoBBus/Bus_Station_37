@@ -20,7 +20,15 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "$entities/*": [ "./src/entities/*" ],
+      "$features/*": [ "./src/features/*" ],
+      "$widgets/*": [ "./src/widgets/*" ],
+      "$pages/*": [ "./src/pages/*" ],
+      "$shared/*": [ "./src/shared/*" ],
+      "$assets/*": [ "./src/assets/*" ]
+    }
   },
   "include": ["src"]
 }
