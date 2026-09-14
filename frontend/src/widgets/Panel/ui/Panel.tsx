@@ -56,10 +56,11 @@ const Panel = (props: PanelProps) => {
     };
 
     const debouncedSearch = useMemo(() => {
+        //eslint-disable-next-line
         return debounce((searchValue: unknown) => {
             loadingOffset.current = 0;
             
-            loadingFunction.current(0, 20, searchValue as string)
+            loadingFunction.current?.(0, 20, searchValue as string)
                 .then((r: Item[]) => setItems(new Map(r.map(item => [item.id, item]))));
         }, 600);
     }, [loadingOffset.current]);

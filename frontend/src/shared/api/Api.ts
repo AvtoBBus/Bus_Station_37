@@ -1,6 +1,6 @@
 export class BaseApi {
 
-    basePath = 'http://localhost:3000/';
+    basePath = import.meta.env.BACKEND_URL ?? "http://localhost:3000/";
 
     constructor() {}
 
